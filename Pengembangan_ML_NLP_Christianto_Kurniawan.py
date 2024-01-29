@@ -28,9 +28,8 @@ sinopsis_latih, sinopsis_test, label_latih, label_test = train_test_split(sinops
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-tokenizer = Tokenizer(num_words=5000)
+tokenizer = Tokenizer(num_words=5000, oov_token='x')
 tokenizer.fit_on_texts(sinopsis_latih)
-tokenizer.fit_on_texts(sinopsis_test)
 
 sekuens_latih = tokenizer.texts_to_sequences(sinopsis_latih)
 sekuens_test = tokenizer.texts_to_sequences(sinopsis_test)
@@ -51,8 +50,8 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 
 class myCallback(tf.keras.callbacks.Callback):
   def on_epoch_end(self, epoch, logs={}):
-    if(logs.get('accuracy')>0.85):
-      print("\nAkurasi telah mencapai >85%!")
+    if(logs.get('accuracy')>0.90):
+      print("\nAkurasi telah mencapai >90%!")
       self.model.stop_training = True
 callbacks = myCallback()
 
@@ -63,3 +62,23 @@ history = model.fit(padded_latih,
                     validation_data=(padded_test, label_test),
                     verbose=2,
                     callbacks=[callbacks])
+
+import matplotlib.pyplot as plt
+
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('Akurasi Model')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+
+import matplotlib.pyplot as plt
+
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Loss Model')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
